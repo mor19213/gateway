@@ -1,19 +1,19 @@
-import paho.mqtt.client as mqtt
-from mqtt import producer
-import sys
-from my_requests import plataformaRequest
-
-# program that every 5 seconds publishes a message to the topic sensor/temperature
-# with a random value between 0 and 100
-import random
 import time
+import paho.mqtt.client as mqtt
+import json
+from mqtt import producer
+from my_requests import plataformaRequest
 
 producer = producer()
 Request = plataformaRequest("danielam")
+name = "luz"
+print("inicio")
+
 while True:
-    producer.publish("sensor/temperature", random.randint(0, 100))
-    data = {"valor": random.randint(0, 100)}
+    data = json.loads(Request.get(name).text)
+    #print(Request.get(name))
+    #print(type(data))
+    producer.publish("actuador/"+name, data["valor"])
     print(data)
-    Request.put("temperatura", data)
-    print(Request.get("luz"))
+
     time.sleep(5)
