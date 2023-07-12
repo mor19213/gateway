@@ -22,3 +22,8 @@ pip install paho-mqtt
 
 ## Configuracion
 
+## Pruebas
+### pruebas mosquitto
+```bash
+sudo apt install mosquitto-clients
+```
