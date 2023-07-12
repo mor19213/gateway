@@ -15,16 +15,20 @@ def on_message(client, userdata, msg):
     name = (msg.topic.split("/")[1])
     tipo = (msg.topic.split("/")[0])
     if tipo == "sensor":
-        print("nombre del sensor: "+name)
-        payload = json.loads(msg.payload)
-        print("valor del sensor: "+str(payload))
-        data = {"valor": payload}
-        print(data)
-        status = Request.put(name, data)
-        if status == 200:
-            print("actualizado")
-        else:
-            print("error")
+        try:
+            print("nombre del sensor: "+name)
+            payload = json.loads(msg.payload)
+            print("valor del sensor: "+str(payload))
+            data = {"valor": payload}
+            print(data)
+            status = Request.put(name, data)
+            if status == 200:
+                print("actualizado")
+            else:
+                print("error")
+        except:
+            print("formato distinto al esperado")
+            print(msg.payload)
     else:
         print("tipo incorrecto")
 
