@@ -9,7 +9,6 @@ Request = plataformaRequest("mor19213")
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
     client.subscribe("sensor/#")
-    client.subscribe("actualizar/")
 
 def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.payload))
@@ -33,20 +32,6 @@ def on_message(client, userdata, msg):
                 print(msg.payload)
         else:
             print("No se envio el valor")
-    elif tipo == "actualizar":
-        print("tipo actualizar")
-        payload = msg.payload.decode('utf-8')
-        name = payload
-        print(name)
-        my_request = Request.get(name)
-        if my_request.status_code == 200:
-            data = my_request.json()
-            data = str({'valor': str(data["valor"])})
-            print(data)
-            producer.publish("actuador/"+name, data)
-
-        else:
-            print(my_request)
 
     else:
         print("tipo incorrecto")
