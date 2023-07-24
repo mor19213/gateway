@@ -1,6 +1,9 @@
 import paho.mqtt.client as mqtt
 import json
 from mqtt import producer
+
+import sys
+sys.path.append("..")
 from my_requests import plataformaRequest
 
 producer = producer()
