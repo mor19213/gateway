@@ -7,7 +7,7 @@ import time
 
 RCV_IP = "0.0.0.0"
 RCV_PORT = 5005
-TEST_IP = "172.16.5.4"
+TEST_IP = "192.168.0.122"
 TEST_PORT = 5005
 SEND_PORT = 50
 actuadores = []
@@ -25,14 +25,14 @@ def recieve_message():
             valor = (msg.split("/")[2])
             name = (msg.split("/")[1])
             tipo = (msg.split("/")[0])
-            print("tipo: "+tipo)
+            """print("tipo: "+tipo)
             print("nombre: "+name)
-            print("valor: "+valor)
+            print("valor: "+valor)"""
             data = {"valor": valor}
             if tipo == "sensor":
                 my_request = Request.put(name, data)
-                if my_request.status_code == 200:
-                    print("actualizado")
+                #if my_request.status_code == 200:
+                #    print("actualizado")
             elif tipo == "actuador":
                 # add actuador to list if not already in it
                 if valor == "desconectar":
@@ -40,13 +40,14 @@ def recieve_message():
                     print("actuador a eliminar: "+actuador["nombre"])
                     actuadores.remove(actuador)
                 else:
-                    if not any(actuador["nombre"] == name for actuador in actuadores):
+                    if not any((actuador["nombre"] == name and actuador["ip"] == addr[0]) for actuador in actuadores):
                         actuadores.append({"nombre": name, "ip": addr[0]})
                 print(actuadores)
             elif tipo == "test":
                 print(msg)
             else:
                 print(data)
+            
 
         except:
             print("Error al recibir")
@@ -67,7 +68,7 @@ def send_message():
             try:
                 my_request = Request.get(actuador["nombre"])
                 if my_request.status_code == 200:
-                    print("actualizado")
+                    #print("actualizado")
                     data = my_request.json()
                     data = str({'valor': str(data["valor"])})
                     data = "test/"+actuador["nombre"]+"/"+data
