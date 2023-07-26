@@ -9,7 +9,7 @@ RCV_IP = "0.0.0.0"
 RCV_PORT = 5005
 TEST_IP = "192.168.0.122"
 TEST_PORT = 5005
-SEND_PORT = 50
+SEND_PORT = 5005
 actuadores = []
 Request = plataformaRequest("mor19213")
 
@@ -25,9 +25,9 @@ def recieve_message():
             valor = (msg.split("/")[2])
             name = (msg.split("/")[1])
             tipo = (msg.split("/")[0])
-            """print("tipo: "+tipo)
+            print("tipo: "+tipo)
             print("nombre: "+name)
-            print("valor: "+valor)"""
+            print("valor: "+valor)
             data = {"valor": valor}
             if tipo == "sensor":
                 my_request = Request.put(name, data)
@@ -43,7 +43,7 @@ def recieve_message():
                     if not any((actuador["nombre"] == name and actuador["ip"] == addr[0]) for actuador in actuadores):
                         actuadores.append({"nombre": name, "ip": addr[0]})
                 print(actuadores)
-            elif tipo == "test":
+            elif tipo == "valActuador":
                 print(msg)
             else:
                 print(data)
@@ -63,7 +63,7 @@ send_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 def send_message():
     while True:
         # wait 4 seconds
-        time.sleep(4)
+        time.sleep(1)
         for actuador in actuadores:
             try:
                 my_request = Request.get(actuador["nombre"])
@@ -71,9 +71,9 @@ def send_message():
                     #print("actualizado")
                     data = my_request.json()
                     data = str({'valor': str(data["valor"])})
-                    data = "test/"+actuador["nombre"]+"/"+data
-                    send_socket.sendto(data.encode("utf-8"), (actuador["ip"], TEST_PORT))
-                    ##send_socket.sendto(data.encode("utf-8"), (actuador["ip"], SEND_PORT))
+                    dataTopic = "valActuador/"+actuador["nombre"]+"/"+data
+                    send_socket.sendto(dataTopic.encode("utf-8"), (TEST_IP, TEST_PORT))
+                    send_socket.sendto(data.encode("utf-8"), (actuador["ip"], SEND_PORT))
                 else:
                     # remove actuador from list
                     actuadores.remove(actuador)
