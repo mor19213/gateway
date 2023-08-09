@@ -1,5 +1,3 @@
-import sys
-sys.path.append("..")
 from my_requests import plataformaRequest
 import socket
 import threading
@@ -77,7 +75,7 @@ def send_message():
                 else:
                     # remove actuador from list
                     actuadores.remove(actuador)
-                    print("Actuador removido")
+                    print("Actuador eliminado")
 
             except:
                 print("Error al enviar")

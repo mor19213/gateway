@@ -11,6 +11,11 @@ sudo apt install python3-pip
 sudo apt install -y mosquitto
 ```
 
+#### Dependencias de python
+```bash
+pip install paho-mqtt
+```
+
 ### AMQP
 https://www.rabbitmq.com/install-debian.html#manual-installation
 ```bash
@@ -25,9 +30,13 @@ sudo apt-get install -y erlang-base \
 sudo apt-get install rabbitmq-server -y --fix-missing
 ```
 
+### Bluetooth
 #### Dependencias de python
 ```bash
-pip install paho-mqtt
+pip install setuptools
+sudo apt-get install libbluetooth-dev
+pip install PyBlueZ
+
 ```
 
 
