@@ -3,6 +3,8 @@ import requests
 class plataformaRequest:
     def __init__(self, user):
         self.url = "https://backend-tesis-mor19213.cloud.okteto.net/"+user
+        self.access = ""
+        self.refresh = ""
 
     def get(self, nombre):
         response = requests.get(self.url +"/actuador/"+ nombre)
