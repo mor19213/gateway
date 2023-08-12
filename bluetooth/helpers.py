@@ -9,40 +9,43 @@ def scan():
 dispositivos = scan()
 print(dispositivos)
 
-def device(name, puerto):
-    print("init")
-    sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-    sock.connect((addr, puerto))
-    message = "C"
-    sock.send("{}".format(message))
-    while True:
-        # check if the bluetooth connection is still open
-        if sock.fileno() == -1:
-            print("esperando data")
-            data = sock.recv(2048)
-            if not data:
-                break
-            recibido = data.decode('utf-8')
-            print(f"Recibido: {recibido}")
-            if recibido.find("sensor") != -1:
-                nombre = recibido.split("/")[1]
-                valor = recibido.split("/")[2]
-                print("nombre: {nombre}, valor: {valor}}")
-            elif recibido.find("actuador") != -1:
-                nombre = recibido.split("/")[1]
-                print("nombre: {nombre}")
-            elif recibido.find("desconectar") != -1:
-                print("desconectar dispositivo {name}")
+def device(name, sock, puerto):
+    try:
+        while sock.fileno() != -1:
+            try:
+                data = sock.recv(2048)
+                if not data:
+                    break
+                recibido = data.decode('utf-8')
+                print(f"Recibido: {recibido}")
+                if recibido.find("sensor") != -1:
+                    nombre = recibido.split("/")[1]
+                    valor = recibido.split("/")[2]
+                elif recibido.find("actuador") != -1:
+                    nombre = recibido.split("/")[1]
+                elif recibido.find("desconectar") != -1:
+                    print("Desconectado")
+                    sock.close()
+                    return
+            except bluetooth.btcommon.BluetoothError as e:
+                print(f"Bluetooth error: {e}")
+                print("Desconectado")
+                sock.close()
                 return
-        else:
-            sock.close()
-            return
-    sock.close()
-    return
-
+    except Exception as e:
+        print(f"Error: {e}")
+        sock.close()
+        return
+    
 puerto = 1
 for addr, name, device_class in dispositivos:
     if name.find("Disp") != -1:
         print(name)
-        threading.Thread(target=device, args=(name, puerto)).start()
+        sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+        sock.connect((addr, 1))
+        message = "C"
+        sock.send("{}".format(message))
+        #device(name, sock, puerto)
+        threading.Thread(target=device, args=(name, sock, puerto)).start()
         puerto += 1
+
