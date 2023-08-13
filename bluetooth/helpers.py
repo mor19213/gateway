@@ -20,7 +20,7 @@ def device(name, sock, puerto):
                 if not data:
                     break
                 recibido = data.decode('utf-8')
-                print("Recibido: "+recibido)
+                #print("Recibido: "+recibido)
                 if recibido.find("sensor") != -1:
                     nombre = recibido.split("/")[1]
                     valor = recibido.split("/")[2]
@@ -30,20 +30,20 @@ def device(name, sock, puerto):
                         data = {"valor": valor}
                     except:
                         continue
+                    print(nombre +": "+str(data))
                     my_request = Request.put(nombre, data)
-                    print(my_request.status_code)
                 elif recibido.find("actuador") != -1:
                     #print("Recibido: "+recibido)
                     nombre = recibido.split("/")[1]
                     nombre = nombre.split("\n")[0]
                     if nombre == "actuador":
                         continue
-                    print("nombre actuador: " + nombre)
                     my_request = Request.get(nombre)
                     if my_request.status_code == 200:
                         #print("actualizado")
                         data = my_request.json()
                         data = str({'valor': str(data["valor"])})
+                        print(nombre +": "+str(data))
                         sock.send("{}".format(data))
                     else:
                         print("Error en request")

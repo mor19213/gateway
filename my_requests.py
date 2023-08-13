@@ -1,19 +1,50 @@
 import requests
+import os
+
+# Replace 'ENV_VARIABLE_NAME' with the actual name of the environment variable you want to access
+
+
 
 class plataformaRequest:
     def __init__(self, user):
+        self.base_url = "https://backend-tesis-mor19213.cloud.okteto.net/"
         self.url = "https://backend-tesis-mor19213.cloud.okteto.net/"+user
         self.access = ""
         self.refresh = ""
+        self.username = user
+        self.password = os.environ.get('PASSWORD')
+        if self.password is None:
+            raise Exception("PASSWORD environment variable not set")
+        response = self.login()
+    
+    def login(self):
+        data = {"username": self.username, "password": self.password}
+        response = requests.post(self.base_url + "/tokens", data)
+        self.access = response.json()["access"]
+        self.refresh = response.json()["refresh"]
+        if response.status_code != 200:
+            raise Exception("No se pudo iniciar sesion")
+        return response
+
+    def refresh_token(self):
+        data = {"refresh": self.refresh, "username": self.username}
+        response = requests.post(self.base_url + "/tokens/refresh", {"data": data})
+        self.access = response.json()["access"]
+        return response
 
     def get(self, nombre):
-        response = requests.get(self.url +"/actuador/"+ nombre)
-        #print(self.url +"/actuador/"+ nombre)
+        response = requests.get(self.url +"/actuador/"+ nombre, headers={"Authorization": "Bearer " + self.access})
+        if response.status_code == 403:
+            self.login()
+            response = requests.get(self.url +"/actuador/"+ nombre, headers={"Authorization": "Bearer " + self.access})
         return response
 
     def put(self, nombre, data):
         #print(self.url + "/sensor/"+ nombre)
-        response = requests.put(self.url+"/sensor/" + nombre, json=data)
+        response = requests.put(self.url+"/sensor/" + nombre, json=data, headers={"Authorization": "Bearer " + self.access})
+        if response.status_code == 403:
+            self.login()
+            response = requests.put(self.url+"/sensor/" + nombre, json=data, headers={"Authorization": "Bearer " + self.access})
         return response
     
     def get_dispositivos(self):
