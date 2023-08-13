@@ -1,10 +1,6 @@
 import requests
 import os
 
-# Replace 'ENV_VARIABLE_NAME' with the actual name of the environment variable you want to access
-
-
-
 class plataformaRequest:
     def __init__(self, user):
         self.base_url = "https://backend-tesis-mor19213.cloud.okteto.net/"

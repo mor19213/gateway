@@ -39,7 +39,10 @@ def recieve_message():
                     actuadores.remove(actuador)
                 else:
                     if not any((actuador["nombre"] == name and actuador["ip"] == addr[0]) for actuador in actuadores):
-                        actuadores.append({"nombre": name, "ip": addr[0]})
+                        actuadores.append({"nombre": name, "ip": addr[0], "time": time.time()})
+                    else:
+                        actuador = next((actuador for actuador in actuadores if actuador["nombre"] == name and actuador["ip"] == addr[0]), None)
+                        actuador["time"] = time.time()
                 print(actuadores)
             elif tipo == "valActuador":
                 print(msg)
@@ -63,6 +66,10 @@ def send_message():
         # wait 4 seconds
         time.sleep(1)
         for actuador in actuadores:
+            if actuador["time"] < time.time() - 100:
+                actuadores.remove(actuador)
+                print("Actuador eliminado")
+                continue
             try:
                 my_request = Request.get(actuador["nombre"])
                 if my_request.status_code == 200:
@@ -92,7 +99,7 @@ def send_test():
             message = input("")
             test_socket.sendto(message.encode("utf-8"), (TEST_IP, TEST_PORT))
         except:
-            print("error test")
+            #print("error test")
             continue
     test_socket.close()
 

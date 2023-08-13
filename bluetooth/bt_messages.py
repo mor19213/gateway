@@ -27,7 +27,7 @@ def device(name, sock, puerto):
                     valor = valor.split("\n")[0]
                     try:
                         valor = float(valor)
-                        data = {"valor": valor}
+                        data = {"valor": str(valor)}
                     except:
                         continue
                     print(nombre +": "+str(data))
