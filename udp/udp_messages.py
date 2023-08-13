@@ -23,11 +23,11 @@ def recieve_message():
             valor = (msg.split("/")[2])
             name = (msg.split("/")[1])
             tipo = (msg.split("/")[0])
-            print("tipo: "+tipo)
-            print("nombre: "+name)
-            print("valor: "+valor)
             data = {"valor": str(valor)}
             if tipo == "sensor":
+                print("tipo: "+tipo)
+                print("nombre: "+name)
+                print("valor: "+valor+"\n")
                 my_request = Request.put(name, data)
                 #if my_request.status_code == 200:
                 #    print("actualizado")
@@ -43,10 +43,15 @@ def recieve_message():
                     else:
                         actuador = next((actuador for actuador in actuadores if actuador["nombre"] == name and actuador["ip"] == addr[0]), None)
                         actuador["time"] = time.time()
-                print(actuadores)
+                #print(actuadores)
             elif tipo == "valActuador":
+                print("tipo: Actualizar actuador")
+                print("nombre: "+name)
+                print("valor: "+valor+"\n")
+                continue
                 print(msg)
             else:
+                continue
                 print(data)
             
 
