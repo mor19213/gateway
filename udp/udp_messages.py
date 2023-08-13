@@ -26,7 +26,7 @@ def recieve_message():
             print("tipo: "+tipo)
             print("nombre: "+name)
             print("valor: "+valor)
-            data = {"valor": valor}
+            data = {"valor": str(valor)}
             if tipo == "sensor":
                 my_request = Request.put(name, data)
                 #if my_request.status_code == 200:
