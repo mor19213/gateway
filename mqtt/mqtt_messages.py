@@ -25,7 +25,7 @@ def on_message(client, userdata, msg):
                 #print("nombre del sensor: "+name)
                 data = payload
                 print(data)
-                print("\n\n")
+                #print("\n\n")
                 my_request = Request.put(name, data)
                 if my_request.status_code == 200:
                     print("actualizado")
@@ -35,18 +35,18 @@ def on_message(client, userdata, msg):
                 print("formato distinto al esperado")
                 print(msg.payload)
         else:
-            print("No se envio el valor")
+            print("No se envio el valor del sensor")
     elif tipo == "actualizar":
         print("tipo actualizar")
         payload = msg.payload.decode('utf-8')
         name = payload
-        print(name)
+        #print(name)
         my_request = Request.get(name)
         if my_request.status_code == 200:
             data = my_request.json()
             data = str({'valor': str(data["valor"])})
             print(data)
-            producer.publish("actuador/"+name, data)
+            producer.publish("actuador/"+str(name), data)
 
         else:
             print(my_request)
