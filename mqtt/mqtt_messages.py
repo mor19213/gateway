@@ -20,6 +20,7 @@ def on_message(client, userdata, msg):
     tipo = (msg.topic.split("/")[0])
     if tipo == "sensor":
         payload = json.loads(msg.payload)   
+        payload["valor"] = str(payload["valor"])
         if payload["valor"]:
             try:
                 #print("nombre del sensor: "+name)
