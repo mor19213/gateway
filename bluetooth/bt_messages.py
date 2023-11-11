@@ -1,26 +1,28 @@
 from my_requests import plataformaRequest
 import bluetooth
 import threading
+import time
 
 Request = plataformaRequest("mor19213")
+exit_flag = False
+logs = True
 
 def scan():
     print("Scanning for bluetooth devices:")
     devices = bluetooth.discover_devices(lookup_names = True, lookup_class = True)
     return devices
 
-dispositivos = scan()
-print(dispositivos)
-
 def device(name, sock, puerto):
+    global exit_flag
+    global logs
+    print(f"Connected to {name}")
     try:
-        while sock.fileno() != -1:
+        while sock.fileno() != -1 and not exit_flag:
             try:
                 data = sock.recv(2048)
                 if not data:
                     break
                 recibido = data.decode('utf-8')
-                #print("Recibido: "+recibido)
                 if recibido.find("sensor") != -1:
                     nombre = recibido.split("/")[1]
                     valor = recibido.split("/")[2]
@@ -30,44 +32,79 @@ def device(name, sock, puerto):
                         data = {"valor": str(valor)}
                     except:
                         continue
-                    print(nombre +": "+str(data))
+                    if logs:
+                        print(nombre +": "+str(data))
                     my_request = Request.put(nombre, data)
                 elif recibido.find("actuador") != -1:
-                    #print("Recibido: "+recibido)
                     nombre = recibido.split("/")[1]
                     nombre = nombre.split("\n")[0]
                     if nombre == "actuador":
                         continue
                     my_request = Request.get(nombre)
                     if my_request.status_code == 200:
-                        #print("actualizado")
                         data = my_request.json()
                         data = str({'valor': str(data["valor"])})
-                        print(nombre +": "+str(data))
+                        if logs:
+                            print(nombre +": "+str(data))
                         sock.send("{}".format(data))
                     else:
                         print("Error en request")
                 elif recibido.find("desconectar") != -1:
-                    print("Desconectado")
+                    if logs:
+                        print("Desconectado")
                     sock.close()
                     return
             except bluetooth.btcommon.BluetoothError as e:
-                print(f"Bluetooth error: {e}")
-                print("Desconectado")
+                if logs:
+                    print(f"Bluetooth error {name}: {e}")
                 sock.close()
                 return
     except Exception as e:
-        print(f"Error: {e}")
+        #print(f"Error: {e}")
         sock.close()
         return
-    
-puerto = 1
-for addr, name, device_class in dispositivos:
-    if name.find("Disp") != -1:
-        print(name)
-        sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-        sock.connect((addr, 1))
-        #device(name, sock, puerto)
-        threading.Thread(target=device, args=(name, sock, puerto)).start()
-        puerto += 1
 
+def reconectar_todos():
+    global exit_flag
+    global logs
+    ejecutando = True
+    hilos, puerto = conectar(1)
+    while ejecutando:
+        cmd = input("").lower()        
+        if cmd in ["1", "l", "logs"]:
+            logs = not logs     # Toggle logs
+            print(f'Logs are {"enabled" if logs else "disabled"}.')
+        elif cmd in ["2", "r", "reconectar"]:
+            exit_flag = True
+            for h in hilos:
+                h.join()    # Esperar a que los hilos terminen de ejecutarse
+            print("Se han desconectado todos los dispositivos")
+            exit_flag = False
+            time.sleep(5)
+            hilos = []
+            hilos, puerto = conectar(puerto)
+        elif cmd in ["3", "q", "quit", "exit"]:
+            exit_flag = True
+            for h in hilos:
+                h.join()    # Esperar a que los hilos terminen de ejecutarse
+            exit_flag = False
+            ejecutando = False
+
+
+def conectar(puerto):
+    dispositivos = scan()
+    print(dispositivos)
+    hilos = []
+    for addr, name, device_class in dispositivos:
+        if name.find("Disp") != -1:
+            print(name)
+            sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+            sock.connect((addr, 1))
+            #device(name, sock, puerto)
+            hilo = threading.Thread(target=device, args=(name, sock, puerto))
+            hilo.start()
+            hilos.append(hilo)
+            puerto += 1
+    return hilos, puerto
+
+threading.Thread(target=reconectar_todos, args=()).start()
