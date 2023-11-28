@@ -4,11 +4,13 @@ import os
 class plataformaRequest:
     def __init__(self, user):
         self.base_url = "https://backend-tesis-mor19213.cloud.okteto.net/"
+        self.hist_url = "https://historical-tesis-mor19213.cloud.okteto.net"
         self.url = "https://backend-tesis-mor19213.cloud.okteto.net/"+user
         self.access = ""
         self.refresh = ""
         self.username = user
-        self.password = os.environ.get('PASSWORD')
+        self.counter = 0
+        self.password = "Tesis123$" #os.environ.get('PASSWORD')
         if self.password is None:
             raise Exception("PASSWORD environment variable not set")
         response = self.login()
@@ -32,7 +34,16 @@ class plataformaRequest:
         response = requests.get(self.url +"/actuadores/"+ nombre, headers={"Authorization": "Bearer " + self.access})
         if response.status_code == 403:
             self.login()
-            response = requests.get(self.url +"/actuadores/"+ nombre, headers={"Authorization": "Bearer " + self.access})
+        response = requests.get(self.url +"/actuadores/"+ nombre, headers={"Authorization": "Bearer " + self.access})
+        return response
+    
+    def updateHistorical(self, nombre, data):
+        response = None
+        if self.counter == 0:
+            response = requests.post(f"{self.hist_url}/users/{self.username}/sensor/{nombre}/valores/{data['valor']}")
+        elif self.counter == 100:
+            self.counter = 0
+        self.counter += 1
         return response
 
     def put(self, nombre, data):
@@ -41,6 +52,7 @@ class plataformaRequest:
         if response.status_code == 403:
             self.login()
             response = requests.put(self.url+"/sensores/" + nombre, json=data, headers={"Authorization": "Bearer " + self.access})
+        response_hist = self.updateHistorical(nombre, data)
         return response
     
     def get_dispositivos(self):
