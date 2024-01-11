@@ -12,6 +12,7 @@ actuadores = []
 username = "mor19213"
 url = f"http://127.0.0.1:8000/{username}"
 resp = requests.get(f"{url}/login")
+wait_time = 100
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((RCV_IP, RCV_PORT))
@@ -73,7 +74,7 @@ def send_message():
         # wait 4 seconds
         time.sleep(1)
         for actuador in actuadores:
-            if actuador["time"] < time.time() - 100:
+            if actuador["time"] < time.time() - wait_time:
                 actuadores.remove(actuador)
                 print("Actuador eliminado")
                 continue
