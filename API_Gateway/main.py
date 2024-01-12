@@ -38,7 +38,7 @@ def login(user: str):
 login("mor19213")
 
 def refresh(refresh: str):
-    data = {"refresh": refresh}
+    data = {"refresh": u.refresh}
     response = requests.post(base_url + "/tokens/refresh", data)
     u.access = response.json()["access"]
     u.refresh = response.json()["refresh"]
