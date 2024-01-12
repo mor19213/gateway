@@ -13,8 +13,6 @@ logs = True
 active_reconnect = True
 username = "mor19213"
 url = f"http://127.0.0.1:8000/{username}"
-resp = requests.get(f"{url}/login")
-
 def scan():
     print("Scanning for Bluetooth devices:")
     devices = bluetooth.discover_devices(lookup_names=True, lookup_class=True)
@@ -102,12 +100,12 @@ def reconectar_todos():
 
         if cmd in ["1", "l", "logs"]:
             logs = not logs  # Toggle logs
-            print(f'Logs are {"enabled" if logs else "disabled"}.')
+            print(f'Logs estan {"habilitados" if logs else "desabilitados"}.')
         elif cmd in ["2", "r", "reconectar"]:
             exit_flag = True
             for h in hilos:
                 h.join()  # Wait for threads to finish
-            print("All devices have been disconnected")
+            print("Se han desconectado todos los dispositivos")
             exit_flag = False
             time.sleep(5)
             hilos, puerto = conectar(puerto)
@@ -117,7 +115,7 @@ def reconectar_todos():
                 h.join()  # Wait for threads to finish
             exit_flag = False
             ejecutando = False
-            print("The program has finished running")
+            print("El programa ha terminado")
 
 def conectar(puerto):
     dispositivos = scan()
