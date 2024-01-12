@@ -7,7 +7,7 @@ sys.path.append("..")
 producer = producer()
 username = "mor19213"
 url = f"http://127.0.0.1:8000/{username}"
-resp = requests.get(f"{url}/login")
+#resp = requests.get(f"{url}/login")
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
@@ -32,6 +32,9 @@ def on_message(client, userdata, msg):
                 else:
                     print(my_request)
             except:
+                e = input("salir: ")
+                if e=="Y":
+                    exit()
                 print("formato distinto al esperado")
                 print(msg.payload)
         else:
