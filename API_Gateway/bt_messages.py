@@ -46,6 +46,7 @@ def device(name, sock, puerto):
                         continue
                     my_request = requests.get(f"{url}/actuadores/{nombre}")
                     #my_request = Request.get(nombre)
+                    print(my_request)
                     if my_request.status_code == 200:
                         data = my_request.json()
                         data = str({'valor': str(data["valor"])})
