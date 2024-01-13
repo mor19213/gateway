@@ -35,7 +35,7 @@ def login(user: str):
     u.refresh_h = None
     return None
 
-login("mor19213")
+login(u.username)
 
 def refresh():
     data = {"refresh": u.refresh}
@@ -83,7 +83,7 @@ def put_endpoint(user:str, nombre: str, data: dict):
             return JSONResponse(status_code=403, content=jsonable_encoder({"status": "error"}))
         response = requests.put(
             f"{base_url}/{user}/sensores/{nombre}", json=data, headers={"Authorization": f"Bearer " + u.access})
-    update_historical(nombre, data, user)
+    update_historical(nombre, data, u.username)
     return JSONResponse(status_code=response.status_code, content=jsonable_encoder({"status": "ok"}))
 
 def update_historical(nombre: str, sens_data: dict, user: str):
@@ -112,7 +112,10 @@ def update_historical(nombre: str, sens_data: dict, user: str):
         response = requests.post(url+"?access_token="+str(u.access_h))
         #print("request a subir data 1")
         if response.status_code == 403:
-            response = requests.post(hist_url+"/refresh?refresh="+ str(u.refresh_h))
+            data = {"username": user, "password": u.password}
+            #print("request a login")
+            response = requests.post(hist_url + "/login", data=json.dumps(data))
+            #response = requests.post(hist_url+"/refresh?refresh="+ str(u.refresh_h))
             #print("request a refresar")
             if response.status_code == 401:
                 #print("No se pudo refrescar el token")

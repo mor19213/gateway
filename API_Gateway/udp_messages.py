@@ -10,8 +10,8 @@ TEST_PORT = 5005
 SEND_PORT = 5005
 actuadores = []
 username = "mor19213"
-url = f"http://127.0.0.1:8000/{username}"
-resp = requests.get(f"{url}/login")
+url = f"http://192.168.0.122:8000/{username}"
+#resp = requests.get(f"{url}/login")
 wait_time = 100
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

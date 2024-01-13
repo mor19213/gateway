@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 producer = producer()
 username = "mor19213"
-url = f"http://127.0.0.1:8000/{username}"
+url = f"http://192.168.0.122:8000/{username}"
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
